@@ -1,0 +1,21 @@
+import backends
+
+groups = {
+    'leipzig' : {
+        '10.10.0.10': {
+            'password': 'foobar',
+            'backend': backends.ProcurveBackend,
+            'protocol': 'SSHv1'
+        },
+        '10.10.0.11': {
+            'password': 'foobar',
+            'backend': backends.ProcurveBackend,
+        },
+    },
+    'berlin' : {
+        '10.20.0.10': {
+            'password': 'quux',
+            'backend': backends.ProcurveBackend,
+        },
+    },
+}
