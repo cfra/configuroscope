@@ -1,0 +1,9 @@
+TODO
+----
+
+ - Add more device backends
+ - Improve or better even rewrite vt100dropper
+     the general logic seems okay, but a python implementation without too much
+     dependencies would be nice. Also, the current version is quite slow due to
+     the "line buffering". Finally, it really should terminate the spawned child
+     which it currently does not always do.

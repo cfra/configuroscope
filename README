@@ -1,0 +1,57 @@
+Configurograph
+--------------
+
+This software allows to automatically download configurations of various
+(networking) devices. It keeps track of the device configurations in a
+git repository, thus providing both a recent backup of the device configs
+and a historic record of them.
+Additionally, whenever a configuration change occurs, it will send out an
+email showing a diff between old and new config.
+
+Usage
+-----
+
+There is no need to "install" this anywhere deeply into your system.
+Just clone the git repo/download a tarball and extract where you want
+it to run.
+
+Besides a standard python installation and an OpenSSH client, you currently
+need pexpect and (sorry, but I wrote that part in C, you are welcome to write
+an alternate python implementation) a C-Compiler as well as development
+headers for libevent.
+
+Then, run 'make -C backends/utils', to compile that tiny C program the
+software currently relies on.
+
+Have a look at settings.py.sample and create your own settings.py file.
+
+This should be all there is to it. You can run ./host_config to test whether
+fetching of a host's configuration works. And you can run ./host_group_config
+to fetch the configs of all hosts in a specific group to a local directory.
+
+When you are happy with the results, you may consider adding the cronjob
+script to your crontab, so it will regularly backup all hosts and send you
+emails whenever something changes.
+
+Supported Devices
+-----------------
+
+The support for devices is currently pretty limited, so it is likely you
+will have to add support for your paricular device yourself.
+
+  - ProcurveBackend - Procurve/HP Networking notifier, developed and tested
+    with an old HP2524, may or may not work with other devices.
+
+There is also currently one notifier module which supports sending of passive
+check results for each host to a nagios/icinga instance. Its usage is of course
+optional.
+
+Notifiers
+---------
+
+You can setup notifiers for each host, e.g. allowing your monitoring system
+to keep track of the backups.
+
+  - NSCANotifier - submits information about the config backup to your
+    icinga/nagios using the send_nsca tool. It allows you to have a passive
+    check which monitors that config backups are up to date.
