@@ -1,0 +1,35 @@
+import backends
+import notifiers
+
+# Host Definitions
+groups = {
+    'leipzig' : {
+        '10.10.0.10': {
+            'password': 'foobar',
+            'backend': backends.ProcurveBackend,
+            'protocol': 'SSHv1'
+            'notifier': notifiers.NSCANotifier,
+            'nsca_hostname': 'switch_10_0_10',
+            'nsca_servicedesc': 'Config_Backup',
+        },
+        '10.10.0.11': {
+            'password': 'foobar',
+            'backend': backends.ProcurveBackend,
+            'notifier': notifiers.NSCANotifier,
+            'nsca_hostname': 'switch_10_0_11',
+            'nsca_servicedesc': 'Config_Backup',
+        },
+    },
+    'berlin' : {
+        '10.20.0.10': {
+            'password': 'quux',
+            'backend': backends.ProcurveBackend,
+            'notifier': notifiers.NSCANotifier,
+            'nsca_hostname': 'switch_20_0_10',
+            'nsca_servicedesc': 'Config_Backup',
+        },
+    },
+}
+
+# Commandline to send NSCA notifications to for passive checks
+send_nsca_args = ['send_nsca', '-H', '10.255.0.5']

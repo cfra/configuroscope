@@ -65,6 +65,7 @@ class HPSession(pexpect.spawn):
 
 class ProcurveBackend(abstract.AbstractBackend):
     def __init__(self, hostname, settings):
+        super(ProcurveBackend, self).__init__(hostname, settings)
         self.host = hostname
         self.password = settings.pop('password', None)
         self.protocol = settings.pop('protocol', 'SSH')

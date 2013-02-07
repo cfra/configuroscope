@@ -1,0 +1,54 @@
+#!/usr/bin/env python
+import os
+import sys
+import subprocess
+
+import settings
+
+def process_host(hostname, host, datadir):
+    config = None
+    try:
+        backend = host['backend'](hostname, host)
+        config = backend.get_config()
+    except BaseException:
+        sys.excepthook(*sys.exc_info())
+
+    success = False
+    if config is not None:
+        with open(os.path.join(datadir, 'config-%s' % hostname), 'w') as config_file:
+            config_file.write(config)
+        success = True
+
+    if 'notifier' in host:
+        notifier = host['notifier'](hostname, host)
+        notifier.notify(success)
+
+if __name__ == '__main__':
+    if len(sys.argv) != 3:
+        print >>sys.stderr, "Usage: %s <group> <datadir>" % sys.argv[0]
+        sys.exit(1)
+
+    groupname = sys.argv[1]
+    if groupname not in settings.groups:
+        print >>sys.stderr, "Unknown Hostgroup '%s'. Please add to settings.py" % groupname
+        sys.exit(1)
+    group = settings.groups[groupname]
+
+    if not os.path.exists(sys.argv[2]):
+        os.mkdir(sys.argv[2])
+
+    print >>sys.stderr, "Starting fetch run for group '%s'" % groupname
+
+    for hostname in group:
+        host = group[hostname]
+
+        print >>sys.stderr, "Processing tasks for '%s'" % hostname
+        try:
+            process_host(hostname, host, sys.argv[2])
+        except BaseException:
+            print >>sys.stderr, "Processing failed with an exception:"
+            sys.excepthook(*sys.exc_info())
+        else:
+            print >>sys.stderr, "Processing complete"
+
+    print >>sys.stderr, "Fetch run complete."
