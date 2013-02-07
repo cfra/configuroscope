@@ -2,15 +2,15 @@ import contextlib
 import pexpect
 
 import abstract
+from utils import ssh
 from utils import vt100dropper
 
-class HPSession(pexpect.spawn):
+class HPSession(ssh.SSHSession):
     """A pexpect session for HP Networking Switches.
     It uses a tool called vt100dropper to get rid of most of the
     weird escape sequences this switch uses"""
 
-    anchor = r'(?:^|[\r\n])'
-    prompt = anchor + r'(?P<host>\S*)(?P<mode>[#>]) '
+    prompt = ssh.SSHSession.anchor + r'(?P<host>\S*)(?P<mode>[#>]) '
 
     def __init__(self, args, **kwargs):
         password = kwargs.pop('password', None)
@@ -20,25 +20,14 @@ class HPSession(pexpect.spawn):
                 [ vt100dropper.path ] + args,
                 **kwargs)
 
-        stage = -1
-        while True:
-            index = self.expect([
-                r'[pP]assword:',
-                'Press any key to continue',
-                self.prompt,
-            ])
-            if index <= stage:
-                raise RuntimeError("No progress in login process.")
-            stage = index
-            if index == 0:
-                if password is None:
-                    raise RuntimeError("Password required but not given")
-                self.sendline(password)
-            elif index == 1:
-                self.sendline('')
-            else:
-                # Login complete
-                break
+        rv = self.ssh_login(password, [
+            'Press any key to continue',
+            self.prompt,
+        ])
+        if rv == 0:
+            self.sendline('')
+            self.expect(self.prompt)
+        # We got a prompt, login complete
 
     def call(self, command):
         self.sendline(command)
@@ -67,16 +56,14 @@ class ProcurveBackend(abstract.AbstractBackend):
     def __init__(self, hostname, settings):
         super(ProcurveBackend, self).__init__(hostname, settings)
         self.host = hostname
+        self.settings = settings
         self.password = settings.pop('password', None)
-        self.protocol = settings.pop('protocol', 'SSH')
 
     def get_config(self):
-        if self.protocol == 'SSHv1':
-            self.session = HPSession(['ssh', '-1', self.host], password=self.password)
-        elif self.protocol == 'SSH':
-            self.session = HPSession(['ssh', self.host], password=self.password)
-        else:
-            raise RuntimeError("Telnet not supported, sorry")
+        self.session = HPSession(
+                ssh.gen_args(self.host, self.settings),
+                password = self.password
+        )
 
         with contextlib.closing(self.session):
             config = self.session.call('show running-config')
