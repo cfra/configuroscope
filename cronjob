@@ -1,0 +1,62 @@
+#!/bin/sh
+
+cd "`dirname "$0"`"
+
+# Delete old logs
+mkdir -p logs && cd logs
+ls -lt | sed 's/^.* //' | grep log | head -n -30 | xargs rm -f
+cd ..
+
+exec 3>&2
+exec 1>./logs/log-`date +%Y-%m-%d-%H-%M-%S`
+exec 2>&1
+
+for group in `./group_list`; do
+	mkdir -p configs/$group || {
+		echo "Could not create config directory at configs/$group" >&3
+		exit 1
+	}
+	if [ -d "configs/$group/.git" ]; then
+	       :
+	else
+		cd configs/$group
+		git init-db || {
+			echo "Could not initialize git-repo at configs/$group" >&3
+			exit 1
+		}
+		cd ../..
+	fi
+
+	./host_group_config $group configs/$group || {
+		echo "Failed to retrive configuration for some hosts in '$group'" >&3
+		exit 1
+	}
+
+	cd configs/$group
+	git add .
+	if git commit -a -m 'Automated configuroscope commit'; then
+		# If we get here, a change has just been commited.
+		(
+			echo "Config changes have been detected for group '$group'."
+			echo ""
+			git show --pretty=oneline | tail -n +2
+			echo ""
+			echo "Best regards from the Configuroscope"
+		) | python -m base64 -e | mail \
+			-a 'Content-Type: text/plain; charset=UTF-8' \
+			-a 'Content-Transfer-Encoding: base64' \
+			-s "Configuroscope update for $group" \
+			configuroscope-${group} \
+			\
+			|| {
+			echo "Could not send mail." >&3
+			exit 1
+		}
+	else
+		if [ `git status --porcelain 2>&1 | wc -l` -ne 0 ]; then
+			echo "Something went wrong during the configuration commit." >&3
+			exit 1
+		fi
+	fi
+	cd ../..
+done

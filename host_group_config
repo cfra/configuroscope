@@ -38,7 +38,7 @@ if __name__ == '__main__':
         os.mkdir(sys.argv[2])
 
     print >>sys.stderr, "Starting fetch run for group '%s'" % groupname
-
+    failures = False
     for hostname in group:
         host = group[hostname]
 
@@ -48,7 +48,9 @@ if __name__ == '__main__':
         except BaseException:
             print >>sys.stderr, "Processing failed with an exception:"
             sys.excepthook(*sys.exc_info())
+            failues = True
         else:
             print >>sys.stderr, "Processing complete"
 
     print >>sys.stderr, "Fetch run complete."
+    sys.exit(1 if failures else 0)
