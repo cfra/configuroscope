@@ -11,6 +11,12 @@ exec 3>&2
 exec 1>./logs/log-`date +%Y-%m-%d-%H-%M-%S`
 exec 2>&1
 
+echo "Groups:"
+./group_list || {
+	echo "Group list failed." >&3
+	exit 1
+}
+
 for group in `./group_list`; do
 	mkdir -p configs/$group || {
 		echo "Could not create config directory at configs/$group" >&3
