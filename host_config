@@ -21,4 +21,4 @@ if __name__ == '__main__':
     host = group[hostname]
 
     backend = host['backend'](hostname, host)
-    print backend.get_config()
+    sys.stdout.write(backend.get_config())

@@ -15,8 +15,12 @@ def process_host(hostname, host, datadir):
 
     success = False
     if config is not None:
-        with open(os.path.join(datadir, 'config-%s' % hostname), 'w') as config_file:
-            config_file.write(config)
+        storage_path = os.path.join(datadir, 'config-%s' % hostname)
+        if 'store_config' in dir(backend):
+            backend.store_config(config, storage_path)
+        else:
+            with open(storage_path, 'w') as config_file:
+                config_file.write(config)
         success = True
 
     if 'notifier' in host:
