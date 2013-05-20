@@ -4,7 +4,7 @@ cd "`dirname "$0"`"
 
 # Delete old logs
 mkdir -p logs && cd logs
-ls -lt | sed 's/^.* //' | grep log | head -n -30 | xargs rm -f
+ls -1tr | grep log | head -n -30 | xargs rm -f
 cd ..
 
 exec 3>&2
