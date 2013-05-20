@@ -16,13 +16,35 @@ class SSHSession(pexpect.spawn):
         ])
         # We got a prompt, login complete
 
-    def call(self, command):
-        self.sendline(command)
+    def call(self, command, frame=True):
+        if frame:
+            command_line = 'echo "---BEGIN COMMAND---" && ('
+            command_line += command + ') && '
+            command_line += 'echo "---END COMMAND---"'
+        else:
+            command_line = command
+
+        self.sendline(command_line)
         self.expect(self.prompt)
 
         answer = self.before
         answer = answer.replace('\r\n', '\n')
         answer = answer.replace('\r', '\n')
+
+        if not frame:
+            return answer
+
+        begin = "\n---BEGIN COMMAND---\n"
+        end = "---END COMMAND---\n"
+        index = answer.find(begin)
+        if index < 0:
+            raise RuntimeError("Could not parse frame")
+        answer = answer[index + len(begin):]
+        index = answer.find(end)
+        if index < 0:
+            raise RuntimeError("Could not parse frame")
+        answer = answer[:index]
+
         return answer
 
     def ssh_login(self, password, patterns):
