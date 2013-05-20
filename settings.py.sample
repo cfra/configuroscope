@@ -7,6 +7,14 @@ debug = False
 # Host Definitions
 groups = {
     'leipzig' : {
+        '10.10.0.7': {
+            'password': 'foobar',
+            'user': 'root',
+            'backend': backends.OpenwrtLuciBackend,
+            'notifier': notifiers.NSCANotifier,
+            'nsca_hostname': 'cpe_10_0_7',
+            'nsca_servicedesc': 'Config_Backup',
+        },
         '10.10.0.10': {
             'password': 'foobar',
             'backend': backends.ProcurveBackend,
