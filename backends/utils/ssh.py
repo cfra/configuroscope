@@ -1,4 +1,7 @@
 import pexpect
+import sys
+
+import settings
 
 class SSHSession(pexpect.spawn):
     """A pexpect session for AirOS Devices"""
@@ -10,6 +13,9 @@ class SSHSession(pexpect.spawn):
         password = kwargs.pop('password', None)
 
         pexpect.spawn.__init__(self, args[0], args[1:], **kwargs)
+        if 'debug' in dir(settings):
+            if settings.debug:
+                self.logfile = sys.stderr
 
         rv = self.ssh_login(password, [
             self.prompt,

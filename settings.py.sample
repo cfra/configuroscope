@@ -1,6 +1,9 @@
 import backends
 import notifiers
 
+# Set to True to trace the expect sessions
+debug = False
+
 # Host Definitions
 groups = {
     'leipzig' : {
