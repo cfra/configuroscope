@@ -17,4 +17,10 @@ class AirOSBackend(abstract.AbstractBackend):
         )
 
         with contextlib.closing(self.session):
-            return self.session.call("cat /tmp/system.cfg")
+            config = self.session.call("cat /tmp/system.cfg")
+
+        # The config is a line by line key-value store.
+        # The lines change their place somewhat randomly,
+        # therefore, sort the lines to make the diff smaller
+        config = ''.join(sorted(config.splitlines(True)))
+        return config
