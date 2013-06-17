@@ -41,10 +41,8 @@ will have to add support for your paricular device yourself.
 
   - AirOSBackend - Ubiquity AirOS backend, developed and tested with a
     Nanostation M5 and M2
-  - OpenwrtLuciBackend - OpenWRT backend. This variant uses the flash_keep
-    settings from luci and therefore requires luci to be installed. A variant
-    without requirements for luci and a hardcoded backup file list should not
-    be that hard to implement. (Requires tar and hexdump on the openwrt host)
+  - OpenwrtBackend - OpenWRT backend using sysupgrade -b
+    (Requires sysupgrade with -b and hexdump on the openwrt host)
   - ProcurveBackend - Procurve/HP Networking backend, developed and tested
     with an old HP2524, may or may not work with other devices.
 

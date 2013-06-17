@@ -10,7 +10,7 @@ groups = {
         '10.10.0.7': {
             'password': 'foobar',
             'user': 'root',
-            'backend': backends.OpenwrtLuciBackend,
+            'backend': backends.OpenwrtBackend,
             'notifier': notifiers.NSCANotifier,
             'nsca_hostname': 'cpe_10_0_7',
             'nsca_servicedesc': 'Config_Backup',

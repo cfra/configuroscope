@@ -1,3 +1,3 @@
 from airos import AirOSBackend
-from openwrt import OpenwrtLuciBackend
+from openwrt import OpenwrtBackend
 from procurve import ProcurveBackend
