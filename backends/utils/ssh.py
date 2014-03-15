@@ -11,6 +11,13 @@ class SSHSession(pexpect.spawn):
 
     def __init__(self, args, **kwargs):
         password = kwargs.pop('password', None)
+        prompt = kwargs.pop('prompt', None)
+
+        if prompt is not None:
+            if prompt is pexpect.EOF:
+                self.prompt = pexpect.EOF
+            else:
+                self.prompt = self.anchor + prompt
 
         pexpect.spawn.__init__(self, args[0], args[1:], **kwargs)
         if 'debug' in dir(settings):
