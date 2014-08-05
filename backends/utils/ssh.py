@@ -71,20 +71,21 @@ class SSHSession(pexpect.spawn):
         while True:
             index = self.expect([
                 'Are you sure you want to continue connecting (yes/no)?',
-                r'[pP]assword:'] + patterns);
+                r'[pP]assword:',
+                r'Keyboard-interactive'] + patterns)
             if index <= stage:
                 raise RuntimeError("No progress in login process.")
             stage = index
             if index == 0:
                 # Accept new keys by default
                 self.sendline('yes')
-            elif index == 1:
+            elif index < 3:
                 if password is None:
                     raise RuntimeError("Password required but not given")
                 self.sendline(password)
             else:
                 # User pattern matched, pass back control
-                return index - 2
+                return index - 3
 
 def gen_args(hostname, settings):
     """Generate a call to OpenSSH client based on the given settings"""
