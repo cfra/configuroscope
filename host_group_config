@@ -52,7 +52,7 @@ if __name__ == '__main__':
         except BaseException:
             print >>sys.stderr, "Processing failed with an exception:"
             sys.excepthook(*sys.exc_info())
-            failues = True
+            failures = True
         else:
             print >>sys.stderr, "Processing complete"
 
