@@ -11,6 +11,11 @@ class NSCANotifier(abstract.AbstractNotifier):
         self.settings = settings
 
     def notify(self, success):
+        if not success:
+            return # Don't notify icinga on error
+                   # this way, transient errors won't trigger notifications.
+                   # Persistent errors will trigger a notification when the config
+                   # check has become outdated.
         nsca_send = subprocess.Popen(settings.send_nsca_args, stdin=subprocess.PIPE,
                 stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         nsca_message = '%s\t%s\t%s\t%s\n' % (
